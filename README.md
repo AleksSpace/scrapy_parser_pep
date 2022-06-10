@@ -1,1 +1,1 @@
-# scrapy_parser_pep
+# Парсер информации о PEP
