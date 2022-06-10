@@ -14,7 +14,7 @@ class PepParsePipeline:
         status = item['status']
         self.pep_sum[status] = self.pep_sum.get(status, 0) + 1
         return item
-    
+
     def close_spider(self, spider):
         dir_path = BASE_DIR / 'results'
         dir_path.mkdir(exist_ok=True)
