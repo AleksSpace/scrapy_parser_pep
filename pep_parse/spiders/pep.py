@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 import scrapy
 
 from pep_parse.items import PepParseItem
@@ -11,15 +13,17 @@ class PepSpider(scrapy.Spider):
     def parse(self, response):
         peps = response.css('section#numerical-index tbody tr')
         for pep_url in peps:
-            pep = pep_url.css('td a::attr(href)').getall()[0]
+            pep = urljoin(PepSpider.start_urls[0],
+                          pep_url.css('td a::attr(href)').getall()[0])
             yield response.follow(pep, callback=self.parse_pep)
 
     def parse_pep(self, response):
         h1 = response.css('h1.page-title::text').get().strip()
-        number_of_pep = h1.partition(' – ')[0]
+        num = h1.partition(' – ')[0]
+        status = response.css('dt:contains("Status") + dd::text').get()
         data = {
-            'number': number_of_pep.replace('PEP ', ''),
+            'number': num.replace('PEP ', ''),
             'name': h1,
-            'status': response.css('dt:contains("Status") + dd::text').get(),
+            'status': status,
         }
         yield PepParseItem(data)
